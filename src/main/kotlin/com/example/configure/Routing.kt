@@ -1,15 +1,14 @@
 @file:OptIn(ExperimentalTime::class)
 
-package com.example
+package com.example.configure
 
-import com.example.model.CafeMenu.Companion.dummyDataList
+import com.example.domain.model.CafeMenu.Companion.dummyDataList
 import com.example.shared.CafeOrderStatus
 import com.example.shared.OrderDto
 import io.ktor.server.application.*
 import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock

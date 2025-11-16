@@ -1,4 +1,4 @@
-package com.example
+package com.example.configure
 
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*

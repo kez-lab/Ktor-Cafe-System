@@ -1,12 +1,12 @@
 @file:OptIn(ExperimentalTime::class)
 
 package com.example.domain
+
 import com.example.shared.CafeMenuCategory
 import com.example.shared.CafeOrderStatus
 import com.example.shared.CafeUserRole
-
 import org.jetbrains.exposed.v1.core.dao.id.LongIdTable
-import org.jetbrains.exposed.v1.datetime.timestamp
+import org.jetbrains.exposed.v1.datetime.datetime
 import kotlin.time.ExperimentalTime
 
 object CafeMenuTable : LongIdTable(name = "cafe_menu") {
@@ -28,5 +28,5 @@ object CafeOrderTable : LongIdTable(name = "cafe_order") {
     val cafeMenuId = reference("cafe_menu_id", CafeMenuTable)
     val price = integer("price")
     val status = enumerationByName("status", 10, CafeOrderStatus::class)
-    val orderedAt = timestamp("ordered_at")
+    val orderedAt = datetime("ordered_at")
 }

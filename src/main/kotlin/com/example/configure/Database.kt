@@ -3,6 +3,7 @@ package com.example.configure
 import com.example.domain.CafeMenuTable
 import com.example.domain.CafeOrderTable
 import com.example.domain.CafeUserTable
+import com.example.shared.dummy.dummyQueryList
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
 import org.jetbrains.exposed.v1.core.StdOutSqlLogger
@@ -39,7 +40,7 @@ private fun initializeSchema() {
             CafeUserTable,
             CafeOrderTable
         )
-
+        execInBatch(dummyQueryList)
         logger.info("Schema tables created/verified")
     }
 }

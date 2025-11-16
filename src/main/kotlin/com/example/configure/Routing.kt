@@ -2,7 +2,7 @@
 
 package com.example.configure
 
-import com.example.domain.model.CafeMenu.Companion.dummyDataList
+import com.example.domain.repository.CafeMenuRepository
 import com.example.shared.CafeOrderStatus
 import com.example.shared.OrderDto
 import io.ktor.server.application.*
@@ -14,7 +14,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-fun Application.configureRouting() {
+fun Application.configureRouting(cafeMenuRepository: CafeMenuRepository) {
     routing {
         get("/") {
             call.respondText("Hello World!")
@@ -22,12 +22,12 @@ fun Application.configureRouting() {
 
         route("/api") {
             get("/menus") {
-                val list = dummyDataList
+                val list = cafeMenuRepository.findAll()
                 call.respond(list)
             }
             post("/orders") {
                 val request = call.receive<OrderDto.CreateRequest>()
-                val selectedMenu = dummyDataList.first { it.id == request.menuId }
+                val selectedMenu = cafeMenuRepository.read(request.menuId) ?: error("Menu not found")
                 val order = OrderDto.DisplayResponse(
                     orderCode = "ordercode1",
                     menuName = selectedMenu.name,

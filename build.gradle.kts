@@ -22,6 +22,17 @@ dependencies {
     // datetime
     implementation(libs.kotlinx.datetime)
 
+    // database
+    implementation("org.jetbrains.exposed:exposed-core:1.0.0-rc-3")
+    implementation("org.jetbrains.exposed:exposed-jdbc:1.0.0-rc-3")
+    implementation("org.jetbrains.exposed:exposed-dao:1.0.0-rc-3")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:1.0.0-rc-3")
+    implementation("com.zaxxer:HikariCP:5.1.0")
+    implementation("org.postgresql:postgresql:42.7.4")
+
+    // env
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }

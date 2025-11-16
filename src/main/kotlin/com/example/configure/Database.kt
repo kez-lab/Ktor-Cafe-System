@@ -33,7 +33,8 @@ private fun createDataSource(): DataSource {
 
 private fun initializeSchema() {
     transaction {
-        addLogger(StdOutSqlLogger)
+        // 보안 문제로 인해 로그 출력은 주석 처리
+//        addLogger(StdOutSqlLogger)
 
         SchemaUtils.create(
             CafeMenuTable,

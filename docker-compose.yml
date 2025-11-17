@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # Ktor Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ktor-app:latest
+    container_name: ktor-app
+    ports:
+      - "8080:8080"
+    environment:
+      # Use local PostgreSQL by default, can override with .env
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/cafe_db?pgbouncer=false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ktor-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # PostgreSQL Database (for local development/testing)
+  postgres:
+    image: postgres:16-alpine
+    container_name: ktor-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cafe_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Initialize database with schema if needed
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - ktor-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ktor-network:
+    driver: bridge

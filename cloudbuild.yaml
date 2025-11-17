@@ -1,0 +1,73 @@
+# Google Cloud Build Configuration
+# This file automates CI/CD for the Ktor application
+
+# Available substitutions:
+# $PROJECT_ID - Google Cloud Project ID
+# $COMMIT_SHA - Git commit SHA
+# $BRANCH_NAME - Git branch name
+# $SHORT_SHA - Short Git commit SHA
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app:$SHORT_SHA'
+      - '-t'
+      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app:latest'
+      - '.'
+
+  # Step 2: Push Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app'
+    waitFor: ['build-image']
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ktor-app'
+      - '--image=asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app:$SHORT_SHA'
+      - '--region=asia-northeast3'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=10'
+      - '--timeout=300'
+      - '--port=8080'
+      # Environment variables should be set via Secret Manager or manually
+      # '--set-env-vars=DATABASE_URL=$$DATABASE_URL'
+    waitFor: ['push-image']
+
+# Images to be pushed to Artifact Registry
+images:
+  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app:$SHORT_SHA'
+  - 'asia-northeast3-docker.pkg.dev/$PROJECT_ID/ktor-repo/ktor-app:latest'
+
+# Build options
+options:
+  # Use high-performance machine for faster builds
+  machineType: 'N1_HIGHCPU_8'
+
+  # Timeout for entire build
+  timeout: '1200s'  # 20 minutes
+
+  # Logging options
+  logging: CLOUD_LOGGING_ONLY
+
+  # Disk size for build
+  diskSizeGb: 100
+
+# Build timeout
+timeout: '1200s'

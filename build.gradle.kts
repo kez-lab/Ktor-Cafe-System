@@ -36,3 +36,10 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
+
+// Configure Ktor plugin to build Fat JAR
+ktor {
+    fatJar {
+        archiveFileName.set("ktor-app-all.jar")
+    }
+}
